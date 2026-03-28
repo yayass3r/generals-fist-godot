@@ -1,0 +1,20 @@
+# Godot internal
+.godot/editor/
+.godot/exported/
+.godot/imported/
+
+# Build output
+*.apk
+*.aab
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Keystore
+*.keystore
+*.jks
