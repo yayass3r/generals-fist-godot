@@ -11,15 +11,6 @@ content_margin_top = 6.0
 content_margin_right = 8.0
 content_margin_bottom = 6.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_officers_tab"]
-bg_color = Color(0.04, 0.06, 0.12, 0.9)
-border_color = Color(0.15, 0.15, 0.2, 0.5)
-border_width_bottom = 1
-content_margin_left = 8.0
-content_margin_top = 6.0
-content_margin_right = 8.0
-content_margin_bottom = 6.0
-
 [node name="Barracks" type="Control"]
 layout_mode = 1
 anchors_preset = 15
@@ -42,26 +33,32 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_tab_bar")
 
 [node name="HBox" type="HBoxContainer" parent="TabBar"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 alignment = 1
 
 [node name="TabBarracks" type="Button" parent="TabBar/HBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.9, 0.4, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "🏰 القوات"
 
 [node name="TabOfficers" type="Button" parent="TabBar/HBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 text = "🎖️ الضباط"
+
+[node name="TabUpgrades" type="Button" parent="TabBar/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 12
+text = "⬆️ ترقية"
 
 [node name="TabResearch" type="Button" parent="TabBar/HBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 13
-text = "🔬 البحث"
+theme_override_font_sizes/font_size = 12
+text = "🔬 بحث"
 
 [node name="BarracksContent" type="ScrollContainer" parent="."]
 layout_mode = 1
@@ -84,6 +81,19 @@ offset_top = 48.0
 visible = false
 
 [node name="OfficersVBox" type="VBoxContainer" parent="OfficersContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="UpgradesContent" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 48.0
+visible = false
+
+[node name="UpgradesVBox" type="VBoxContainer" parent="UpgradesContent"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8

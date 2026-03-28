@@ -24,6 +24,9 @@ signal officers_changed
 signal fortifications_changed
 signal missions_updated
 signal random_event_occurred(event: Dictionary)
+signal weather_changed(new_weather: int)
+signal convoys_updated
+signal troop_upgrades_changed
 
 # ─── ثوابت الألوان ───
 const COLOR_BG := Color(0.02, 0.03, 0.06, 1.0)
@@ -724,6 +727,151 @@ func _apply_event(event: Dictionary) -> void:
         _pending_events.append(event)
 
 # ═══════════════════════════════════════════════════
+# نظام الطقس الديناميكي
+# ═══════════════════════════════════════════════════
+
+var weather_cycle_timer: float = 0.0
+const WEATHER_CYCLE_INTERVAL: float = 90.0  # تغيير كل 90 ثانية
+var weather_transition_progress: float = 0.0  # 0-1 للتأثير التدريجي
+var weather_notification_shown: bool = true
+
+func update_weather_cycle(delta: float) -> void:
+        weather_cycle_timer += delta
+        if weather_cycle_timer >= WEATHER_CYCLE_INTERVAL:
+                weather_cycle_timer = 0.0
+                _cycle_weather()
+
+func _cycle_weather() -> void:
+        # لا نغير الطقس أثناء المعركة
+        if battle_active:
+                return
+        var old_weather: int = current_weather
+        # الطقس الجديد عشوائي لكن ليس نفس القديم
+        var new_weather: int = current_weather
+        while new_weather == current_weather:
+                new_weather = randi() % 6
+        current_weather = new_weather
+        weather_changed.emit(current_weather)
+
+func get_weather_forecast() -> String:
+        var remaining: float = WEATHER_CYCLE_INTERVAL - weather_cycle_timer
+        var secs: int = int(remaining)
+        return "التغيير خلال: %dث" % secs
+
+func force_weather(weather_idx: int) -> void:
+        if weather_idx >= 0 and weather_idx < 6:
+                current_weather = weather_idx
+                weather_cycle_timer = 0.0
+                weather_changed.emit(current_weather)
+
+# ═══════════════════════════════════════════════════
+# نظام قوافل الإمداد
+# ═══════════════════════════════════════════════════
+
+var active_convoys: Array[Dictionary] = []
+var completed_convoys_count: int = 0
+
+func _init_convoys() -> void:
+        active_convoys = []
+
+func get_available_convoy_targets() -> Array:
+        var targets := []
+        for s in world_sectors:
+                if s["status"] == SectorStatus.CLEARED and s.get("has_supply_base", false):
+                        targets.append(s)
+        return targets
+
+func launch_convoy(scrap_amount: int, fuel_amount: int, intel_amount: int) -> bool:
+        if active_convoys.size() >= 3:
+                return false
+        var total_cost_fuel: int = 20
+        if fuel < total_cost_fuel:
+                return false
+        if scrap_amount + fuel_amount + intel_amount <= 0:
+                return false
+        fuel -= total_cost_fuel
+        var convoy_time: float = 30.0 + float(scrap_amount + fuel_amount + intel_amount) * 0.05
+        active_convoys.append({
+                "id": "convoy_%d" % Time.get_ticks_msec(),
+                "scrap": scrap_amount, "fuel_carry": fuel_amount, "intel": intel_amount,
+                "time_total": convoy_time, "time_remaining": convoy_time,
+                "raided": false,
+        })
+        convoys_updated.emit()
+        return true
+
+func update_convoys(delta: float) -> void:
+        for i in range(active_convoys.size() - 1, -1, -1):
+                var c: Dictionary = active_convoys[i]
+                c["time_remaining"] -= delta
+                if c["time_remaining"] <= 0:
+                        # 90% نجاح، 10% هجوم
+                        if randf() < 0.1:
+                                c["raided"] = true
+                                var lost_pct: float = 0.3 + randf() * 0.4
+                                c["scrap"] = int(float(c["scrap"]) * (1.0 - lost_pct))
+                                c["fuel_carry"] = int(float(c["fuel_carry"]) * (1.0 - lost_pct))
+                                c["intel"] = int(float(c["intel"]) * (1.0 - lost_pct))
+                        scrap += c["scrap"]
+                        fuel += c["fuel_carry"]
+                        intel += c["intel"]
+                        completed_convoys_count += 1
+                        active_convoys.remove_at(i)
+                        convoys_updated.emit()
+
+func get_active_convoy_count() -> int:
+        return active_convoys.size()
+
+# ═══════════════════════════════════════════════════
+# نظام ترقية القوات
+# ═══════════════════════════════════════════════════
+
+var troop_upgrades: Dictionary = {}
+
+func _init_troop_upgrades() -> void:
+        troop_upgrades = {
+                0: {"level": 0, "max_level": 5, "bonus_attack": 0.0, "bonus_defense": 0.0,
+                    "name": "ترقية المشاة", "icon": "🔫", "desc": "+10% هجوم +5% دفاع/مستوى"},
+                1: {"level": 0, "max_level": 5, "bonus_attack": 0.0, "bonus_defense": 0.0,
+                    "name": "ترقية المدرعات", "icon": "🛡️", "desc": "+8% هجوم +12% دفاع/مستوى"},
+                2: {"level": 0, "max_level": 5, "bonus_attack": 0.0, "bonus_defense": 0.0,
+                    "name": "ترقية الطيران", "icon": "✈️", "desc": "+12% هجوم +3% دفاع/مستوى"},
+        }
+
+func get_troop_upgrade_cost(troop_type: int) -> int:
+        var info: Dictionary = troop_upgrades.get(troop_type, {})
+        var lvl: int = info.get("level", 0)
+        return int(150 * pow(1.5, lvl))
+
+func upgrade_troops(troop_type: int) -> bool:
+        if troop_type not in troop_upgrades:
+                return false
+        var info: Dictionary = troop_upgrades[troop_type]
+        if info["level"] >= info["max_level"]:
+                return false
+        var cost: int = get_troop_upgrade_cost(troop_type)
+        if scrap < cost:
+                return false
+        scrap -= cost
+        info["level"] += 1
+        match troop_type:
+                0:  # المشاة: +10% هجوم، +5% دفاع
+                        info["bonus_attack"] += 0.10
+                        info["bonus_defense"] += 0.05
+                1:  # المدرعات: +8% هجوم، +12% دفاع
+                        info["bonus_attack"] += 0.08
+                        info["bonus_defense"] += 0.12
+                2:  # الطيران: +12% هجوم، +3% دفاع
+                        info["bonus_attack"] += 0.12
+                        info["bonus_defense"] += 0.03
+        troop_upgrades_changed.emit()
+        return true
+
+func get_troop_upgrade_bonus(troop_type: int) -> Dictionary:
+        var info: Dictionary = troop_upgrades.get(troop_type, {})
+        return {"attack": info.get("bonus_attack", 0.0), "defense": info.get("bonus_defense", 0.0)}
+
+# ═══════════════════════════════════════════════════
 # الموارد
 # ═══════════════════════════════════════════════════
 var scrap: int = 500:
@@ -958,7 +1106,10 @@ func get_deployed_power() -> int:
                         var level_mult: float = 1.0 + level_bonus_attack
                         # تطبيق بونصات الضباط
                         var officer_atk: float = get_officer_bonus(slot["type"], "attack") + get_officer_bonus(slot["type"], "all_attack")
-                        total_power += int(base_power * officer_atk * terrain_mult * wave_mult * weather_mult * morale_mult * tech_mult * level_mult)
+                        # بونص ترقية القوات
+                        var upgrade_bonus: Dictionary = get_troop_upgrade_bonus(slot["type"])
+                        var upgrade_atk_mult: float = 1.0 + upgrade_bonus["attack"]
+                        total_power += int(base_power * upgrade_atk_mult * officer_atk * terrain_mult * wave_mult * weather_mult * morale_mult * tech_mult * level_mult)
         return total_power
 
 func get_deployed_count() -> int:
@@ -1357,6 +1508,9 @@ func save_game() -> void:
                 "officers": officers, "fortifications": fortifications,
                 "daily_missions": daily_missions, "weekly_missions": weekly_missions,
                 "last_daily_refresh": last_daily_refresh, "last_weekly_refresh": last_weekly_refresh,
+                # أنظمة L3
+                "troop_upgrades": troop_upgrades, "active_convoys": active_convoys,
+                "completed_convoys_count": completed_convoys_count,
         }
         var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
         if file:
@@ -1412,6 +1566,10 @@ func load_game() -> bool:
         weekly_missions = data.get("weekly_missions", weekly_missions)
         last_daily_refresh = data.get("last_daily_refresh", 0)
         last_weekly_refresh = data.get("last_weekly_refresh", 0)
+        # استعادة أنظمة L3
+        troop_upgrades = data.get("troop_upgrades", troop_upgrades)
+        active_convoys = data.get("active_convoys", active_convoys)
+        completed_convoys_count = data.get("completed_convoys_count", 0)
         _process_idle_offline()
         return true
 
@@ -1443,6 +1601,8 @@ func _ready() -> void:
         _init_fortifications()
         _init_missions()
         _init_events()
+        _init_convoys()
+        _init_troop_upgrades()
         if not load_game():
                 print("[GameManager] بداية لعبة جديدة")
         check_mission_refresh()
@@ -1456,6 +1616,8 @@ func _process(delta: float) -> void:
         _idle_tick(delta)
         update_events(delta)
         update_research(delta)
+        update_weather_cycle(delta)
+        update_convoys(delta)
         if battle_active:
                 update_battle(delta)
         _auto_save_timer += delta
