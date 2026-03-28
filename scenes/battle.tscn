@@ -1,6 +1,117 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scenes/battle.gd" id="1_bt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_enemy_box"]
+bg_color = Color(0.06, 0.04, 0.04, 0.9)
+border_color = Color(0.937, 0.267, 0.267, 0.3)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_enemy_progress_bg"]
+bg_color = Color(0.1, 0.05, 0.05, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_enemy_progress_fill"]
+bg_color = Color(0.937, 0.267, 0.267, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_player_section"]
+bg_color = Color(0.04, 0.06, 0.04, 0.9)
+border_color = Color(0.2, 0.7, 0.3, 0.3)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_player_progress_bg"]
+bg_color = Color(0.05, 0.1, 0.05, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_player_progress_fill"]
+bg_color = Color(0.2, 0.8, 0.3, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_smoke_btn"]
+bg_color = Color(0.3, 0.3, 0.3, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_air_btn"]
+bg_color = Color(0.2, 0.3, 0.5, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_retreat_btn"]
+bg_color = Color(0.4, 0.2, 0.2, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_log_section"]
+bg_color = Color(0.03, 0.04, 0.06, 0.9)
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_result_panel"]
+bg_color = Color(0.04, 0.06, 0.12, 0.97)
+border_color = Color(0.788, 0.635, 0.153, 0.5)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_result_btn"]
+bg_color = Color(0.788, 0.635, 0.153, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [node name="Battle" type="Control"]
 layout_mode = 1
@@ -25,22 +136,7 @@ theme_override_constants/separation = 8
 
 [node name="EnemyBox" type="PanelContainer" parent="TopSection"]
 layout_mode = 2
-
-[node name="EnemyStyle" type="StyleBoxFlat" parent="TopSection/EnemyBox"]
-bg_color = Color(0.06, 0.04, 0.04, 0.9)
-border_color = Color(0.937, 0.267, 0.267, 0.3)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-content_margin_left = 10.0
-content_margin_top = 8.0
-content_margin_right = 10.0
-content_margin_bottom = 8.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_enemy_box")
 
 [node name="HBox" type="VBoxContainer" parent="TopSection/EnemyBox"]
 layout_mode = 2
@@ -56,20 +152,8 @@ custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 max_value = 100.0
 value = 100.0
-
-[node name="ProgressBarStyle" type="StyleBoxFlat" parent="TopSection/EnemyBox/HBox/ProgressBar"]
-bg_color = Color(0.1, 0.05, 0.05, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
-[node name="FillStyle" type="StyleBoxFlat" parent="TopSection/EnemyBox/HBox/ProgressBar"]
-bg_color = Color(0.937, 0.267, 0.267, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_enemy_progress_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_enemy_progress_fill")
 
 [node name="VSLabel" type="Label" parent="."]
 layout_mode = 1
@@ -95,22 +179,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = -200.0
-
-[node name="PlayerStyle" type="StyleBoxFlat" parent="PlayerSection"]
-bg_color = Color(0.04, 0.06, 0.04, 0.9)
-border_color = Color(0.2, 0.7, 0.3, 0.3)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-content_margin_left = 10.0
-content_margin_top = 8.0
-content_margin_right = 10.0
-content_margin_bottom = 8.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_player_section")
 
 [node name="HBox" type="VBoxContainer" parent="PlayerSection"]
 layout_mode = 2
@@ -126,20 +195,8 @@ custom_minimum_size = Vector2(0, 16)
 layout_mode = 2
 max_value = 100.0
 value = 100.0
-
-[node name="ProgressBarStyle2" type="StyleBoxFlat" parent="PlayerSection/HBox/ProgressBar"]
-bg_color = Color(0.05, 0.1, 0.05, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-
-[node name="FillStyle2" type="StyleBoxFlat" parent="PlayerSection/HBox/ProgressBar"]
-bg_color = Color(0.2, 0.8, 0.3, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_player_progress_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_player_progress_fill")
 
 [node name="TacticsSection" type="HBoxContainer" parent="."]
 layout_mode = 1
@@ -156,42 +213,24 @@ custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 0.8)
 theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_smoke_btn")
 text = "🚬 ستارة دخان -20⛽"
-
-[node name="SmokeStyle" type="StyleBoxFlat" parent="TacticsSection/SmokeBtn"]
-bg_color = Color(0.3, 0.3, 0.3, 0.8)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
 
 [node name="AirBtn" type="Button" parent="TacticsSection"]
 custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 0.8)
 theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_air_btn")
 text = "✈️ دعم جوي -40⛽"
-
-[node name="AirStyle" type="StyleBoxFlat" parent="TacticsSection/AirBtn"]
-bg_color = Color(0.2, 0.3, 0.5, 0.8)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
 
 [node name="RetreatBtn" type="Button" parent="TacticsSection"]
 custom_minimum_size = Vector2(100, 44)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 0.8)
 theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_retreat_btn")
 text = "🏳️ انسحاب"
-
-[node name="RetreatStyle" type="StyleBoxFlat" parent="TacticsSection/RetreatBtn"]
-bg_color = Color(0.4, 0.2, 0.2, 0.8)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
 
 [node name="LogSection" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -199,13 +238,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_top = 80.0
 anchor_bottom = 160.0
-
-[node name="LogStyle" type="StyleBoxFlat" parent="LogSection"]
-bg_color = Color(0.03, 0.04, 0.06, 0.9)
-content_margin_left = 8.0
-content_margin_top = 6.0
-content_margin_right = 8.0
-content_margin_bottom = 6.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_log_section")
 
 [node name="LogText" type="RichTextLabel" parent="LogSection"]
 layout_mode = 2
@@ -227,22 +260,7 @@ offset_right = 130.0
 offset_bottom = 100.0
 visible = false
 z_index = 10
-
-[node name="ResultStyle" type="StyleBoxFlat" parent="ResultPanel"]
-bg_color = Color(0.04, 0.06, 0.12, 0.97)
-border_color = Color(0.788, 0.635, 0.153, 0.5)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-content_margin_left = 16.0
-content_margin_top = 16.0
-content_margin_right = 16.0
-content_margin_bottom = 16.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_result_panel")
 
 [node name="VBox" type="VBoxContainer" parent="ResultPanel"]
 layout_mode = 2
@@ -265,11 +283,5 @@ custom_minimum_size = Vector2(160, 44)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.05, 0.03, 0.06, 1)
 theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_result_btn")
 text = "✅ متابعة"
-
-[node name="ResultBtnStyle" type="StyleBoxFlat" parent="ResultPanel/VBox/ResultBtn"]
-bg_color = Color(0.788, 0.635, 0.153, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10

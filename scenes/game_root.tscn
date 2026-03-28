@@ -1,6 +1,59 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scenes/game_root.gd" id="1_root"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scrap_box"]
+bg_color = Color(0.05, 0.08, 0.16, 0.9)
+border_color = Color(0.788, 0.635, 0.153, 0.3)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fuel_box"]
+bg_color = Color(0.05, 0.08, 0.16, 0.9)
+border_color = Color(0.878, 0.439, 0.125, 0.3)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_intel_box"]
+bg_color = Color(0.05, 0.08, 0.16, 0.9)
+border_color = Color(0.251, 0.627, 0.878, 0.3)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bottom_nav"]
+bg_color = Color(0.02, 0.03, 0.06, 0.95)
+border_color = Color(0.15, 0.15, 0.2, 0.5)
+border_width_top = 1
 
 [node name="GameRoot" type="Control"]
 layout_mode = 3
@@ -44,22 +97,7 @@ theme_override_constants/separation = 12
 
 [node name="ScrapBox" type="PanelContainer" parent="TopBar/ResourceBar/HBox"]
 layout_mode = 2
-
-[node name="ScrapBoxStyle" type="StyleBoxFlat" parent="TopBar/ResourceBar/HBox/ScrapBox"]
-bg_color = Color(0.05, 0.08, 0.16, 0.9)
-border_color = Color(0.788, 0.635, 0.153, 0.3)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 8.0
-content_margin_top = 4.0
-content_margin_right = 8.0
-content_margin_bottom = 4.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_scrap_box")
 
 [node name="HBox2" type="HBoxContainer" parent="TopBar/ResourceBar/HBox/ScrapBox"]
 layout_mode = 2
@@ -85,22 +123,7 @@ theme_override_font_sizes/font_size = 9
 
 [node name="FuelBox" type="PanelContainer" parent="TopBar/ResourceBar/HBox"]
 layout_mode = 2
-
-[node name="FuelBoxStyle" type="StyleBoxFlat" parent="TopBar/ResourceBar/HBox/FuelBox"]
-bg_color = Color(0.05, 0.08, 0.16, 0.9)
-border_color = Color(0.878, 0.439, 0.125, 0.3)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 8.0
-content_margin_top = 4.0
-content_margin_right = 8.0
-content_margin_bottom = 4.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_fuel_box")
 
 [node name="HBox2" type="HBoxContainer" parent="TopBar/ResourceBar/HBox/FuelBox"]
 layout_mode = 2
@@ -126,22 +149,7 @@ theme_override_font_sizes/font_size = 9
 
 [node name="IntelBox" type="PanelContainer" parent="TopBar/ResourceBar/HBox"]
 layout_mode = 2
-
-[node name="IntelBoxStyle" type="StyleBoxFlat" parent="TopBar/ResourceBar/HBox/IntelBox"]
-bg_color = Color(0.05, 0.08, 0.16, 0.9)
-border_color = Color(0.251, 0.627, 0.878, 0.3)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 8.0
-content_margin_top = 4.0
-content_margin_right = 8.0
-content_margin_bottom = 4.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_intel_box")
 
 [node name="HBox2" type="HBoxContainer" parent="TopBar/ResourceBar/HBox/IntelBox"]
 layout_mode = 2
@@ -172,11 +180,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = -80.0
-
-[node name="BottomNavStyle" type="StyleBoxFlat" parent="BottomNav"]
-bg_color = Color(0.02, 0.03, 0.06, 0.95)
-border_color = Color(0.15, 0.15, 0.2, 0.5)
-border_width_top = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_bottom_nav")
 
 [node name="HBox" type="HBoxContainer" parent="BottomNav"]
 layout_mode = 2

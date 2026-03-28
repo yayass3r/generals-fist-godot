@@ -1,6 +1,86 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scenes/war_room.gd" id="1_wr"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_power_box"]
+bg_color = Color(0.05, 0.08, 0.16, 0.9)
+border_color = Color(0.788, 0.635, 0.153, 0.4)
+border_width_left = 2
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_terrain_box"]
+bg_color = Color(0.05, 0.08, 0.16, 0.9)
+border_color = Color(0.2, 0.3, 0.2, 0.4)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_weather_box"]
+bg_color = Color(0.05, 0.08, 0.16, 0.9)
+border_color = Color(0.2, 0.2, 0.3, 0.4)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_morale_box"]
+bg_color = Color(0.05, 0.08, 0.16, 0.9)
+border_color = Color(0.5, 0.2, 0.2, 0.4)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_troop_selector"]
+bg_color = Color(0.04, 0.06, 0.12, 0.9)
+border_color = Color(0.15, 0.15, 0.2, 0.5)
+border_width_bottom = 1
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_attack_btn"]
+bg_color = Color(0.788, 0.635, 0.153, 1)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
 
 [node name="WarRoom" type="Control"]
 layout_mode = 1
@@ -25,22 +105,7 @@ theme_override_constants/separation = 6
 [node name="PowerBox" type="PanelContainer" parent="TopPanel"]
 layout_mode = 2
 size_flags_horizontal = 3
-
-[node name="PowerBoxStyle" type="StyleBoxFlat" parent="TopPanel/PowerBox"]
-bg_color = Color(0.05, 0.08, 0.16, 0.9)
-border_color = Color(0.788, 0.635, 0.153, 0.4)
-border_width_left = 2
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 8.0
-content_margin_top = 4.0
-content_margin_right = 8.0
-content_margin_bottom = 4.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_power_box")
 
 [node name="HBox" type="HBoxContainer" parent="TopPanel/PowerBox"]
 layout_mode = 2
@@ -58,22 +123,7 @@ theme_override_font_sizes/font_size = 15
 [node name="TerrainBox" type="PanelContainer" parent="TopPanel"]
 layout_mode = 2
 size_flags_horizontal = 3
-
-[node name="TerrainBoxStyle" type="StyleBoxFlat" parent="TopPanel/TerrainBox"]
-bg_color = Color(0.05, 0.08, 0.16, 0.9)
-border_color = Color(0.2, 0.3, 0.2, 0.4)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 8.0
-content_margin_top = 4.0
-content_margin_right = 8.0
-content_margin_bottom = 4.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_terrain_box")
 
 [node name="HBox" type="HBoxContainer" parent="TopPanel/TerrainBox"]
 layout_mode = 2
@@ -91,22 +141,7 @@ theme_override_font_sizes/font_size = 12
 [node name="WeatherBox" type="PanelContainer" parent="TopPanel"]
 layout_mode = 2
 size_flags_horizontal = 3
-
-[node name="WeatherBoxStyle" type="StyleBoxFlat" parent="TopPanel/WeatherBox"]
-bg_color = Color(0.05, 0.08, 0.16, 0.9)
-border_color = Color(0.2, 0.2, 0.3, 0.4)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 8.0
-content_margin_top = 4.0
-content_margin_right = 8.0
-content_margin_bottom = 4.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_weather_box")
 
 [node name="HBox" type="HBoxContainer" parent="TopPanel/WeatherBox"]
 layout_mode = 2
@@ -123,22 +158,7 @@ theme_override_font_sizes/font_size = 12
 [node name="MoraleBox" type="PanelContainer" parent="TopPanel"]
 layout_mode = 2
 size_flags_horizontal = 3
-
-[node name="MoraleBoxStyle" type="StyleBoxFlat" parent="TopPanel/MoraleBox"]
-bg_color = Color(0.05, 0.08, 0.16, 0.9)
-border_color = Color(0.5, 0.2, 0.2, 0.4)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 8.0
-content_margin_top = 4.0
-content_margin_right = 8.0
-content_margin_bottom = 4.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_morale_box")
 
 [node name="HBox" type="HBoxContainer" parent="TopPanel/MoraleBox"]
 layout_mode = 2
@@ -159,15 +179,7 @@ anchors_preset = 10
 anchor_right = 1.0
 offset_top = 40.0
 offset_bottom = 100.0
-
-[node name="TroopStyle" type="StyleBoxFlat" parent="TroopSelector"]
-bg_color = Color(0.04, 0.06, 0.12, 0.9)
-border_color = Color(0.15, 0.15, 0.2, 0.5)
-border_width_bottom = 1
-content_margin_left = 8.0
-content_margin_top = 6.0
-content_margin_right = 8.0
-content_margin_bottom = 6.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_troop_selector")
 
 [node name="TroopLabel" type="Label" parent="TroopSelector"]
 layout_mode = 2
@@ -198,11 +210,5 @@ offset_top = -56.0
 custom_minimum_size = Vector2(0, 50)
 theme_override_colors/font_color = Color(0.05, 0.03, 0.06, 1)
 theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_attack_btn")
 text = "⚔️ هجوم!"
-
-[node name="AttackStyle" type="StyleBoxFlat" parent="AttackBtn"]
-bg_color = Color(0.788, 0.635, 0.153, 1)
-corner_radius_top_left = 0
-corner_radius_top_right = 0
-corner_radius_bottom_right = 0
-corner_radius_bottom_left = 0

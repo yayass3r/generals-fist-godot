@@ -1,6 +1,36 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scenes/world_map.gd" id="1_wm"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top_bar"]
+bg_color = Color(0.04, 0.06, 0.12, 0.9)
+content_margin_left = 10.0
+content_margin_top = 6.0
+content_margin_right = 10.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_info_panel"]
+bg_color = Color(0.04, 0.06, 0.12, 0.95)
+border_color = Color(0.251, 0.627, 0.878, 0.3)
+border_width_top = 1
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scout_btn"]
+bg_color = Color(0.251, 0.627, 0.878, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_attack_map_btn"]
+bg_color = Color(0.937, 0.267, 0.267, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="WorldMap" type="Control"]
 layout_mode = 1
@@ -20,13 +50,7 @@ layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 40.0
-
-[node name="TopStyle" type="StyleBoxFlat" parent="TopBar"]
-bg_color = Color(0.04, 0.06, 0.12, 0.9)
-content_margin_left = 10.0
-content_margin_top = 6.0
-content_margin_right = 10.0
-content_margin_bottom = 6.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_top_bar")
 
 [node name="HBox" type="HBoxContainer" parent="TopBar"]
 layout_mode = 2
@@ -64,15 +88,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = -170.0
 visible = false
-
-[node name="InfoStyle" type="StyleBoxFlat" parent="InfoPanel"]
-bg_color = Color(0.04, 0.06, 0.12, 0.95)
-border_color = Color(0.251, 0.627, 0.878, 0.3)
-border_width_top = 1
-content_margin_left = 12.0
-content_margin_top = 10.0
-content_margin_right = 12.0
-content_margin_bottom = 10.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_info_panel")
 
 [node name="VBox" type="VBoxContainer" parent="InfoPanel"]
 layout_mode = 2
@@ -104,25 +120,13 @@ alignment = 1
 custom_minimum_size = Vector2(140, 40)
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_scout_btn")
 text = "🔍 استطلاع (-15📋)"
-
-[node name="ScoutStyle" type="StyleBoxFlat" parent="InfoPanel/VBox/BtnBox/ScoutBtn"]
-bg_color = Color(0.251, 0.627, 0.878, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
 
 [node name="AttackMapBtn" type="Button" parent="InfoPanel/VBox/BtnBox"]
 custom_minimum_size = Vector2(140, 40)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.05, 0.03, 0.06, 1)
 theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_attack_map_btn")
 text = "⚔️ هجوم!"
-
-[node name="AttackStyle" type="StyleBoxFlat" parent="InfoPanel/VBox/BtnBox/AttackMapBtn"]
-bg_color = Color(0.937, 0.267, 0.267, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8

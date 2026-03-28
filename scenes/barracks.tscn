@@ -1,6 +1,15 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scenes/barracks.gd" id="1_br"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_bar"]
+bg_color = Color(0.04, 0.06, 0.12, 0.9)
+border_color = Color(0.15, 0.15, 0.2, 0.5)
+border_width_bottom = 1
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
 
 [node name="Barracks" type="Control"]
 layout_mode = 1
@@ -20,15 +29,7 @@ layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 44.0
-
-[node name="TabStyle" type="StyleBoxFlat" parent="TabBar"]
-bg_color = Color(0.04, 0.06, 0.12, 0.9)
-border_color = Color(0.15, 0.15, 0.2, 0.5)
-border_width_bottom = 1
-content_margin_left = 8.0
-content_margin_top = 6.0
-content_margin_right = 8.0
-content_margin_bottom = 6.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_tab_bar")
 
 [node name="HBox" type="HBoxContainer" parent="TabBar"]
 layout_mode = 2
