@@ -1,0 +1,213 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/game_root.gd" id="1_root"]
+
+[node name="GameRoot" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.02, 0.03, 0.06, 1)
+
+[node name="ContentContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 40.0
+offset_bottom = -80.0
+
+[node name="TopBar" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_bottom = 40.0
+
+[node name="ResourceBar" type="HBoxContainer" parent="TopBar"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="HBox" type="HBoxContainer" parent="TopBar/ResourceBar"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ScrapBox" type="PanelContainer" parent="TopBar/ResourceBar/HBox"]
+layout_mode = 2
+
+[node name="ScrapBoxStyle" type="StyleBoxFlat" parent="TopBar/ResourceBar/HBox/ScrapBox"]
+bg_color = Color(0.05, 0.08, 0.16, 0.9)
+border_color = Color(0.788, 0.635, 0.153, 0.3)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[node name="HBox2" type="HBoxContainer" parent="TopBar/ResourceBar/HBox/ScrapBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Icon" type="Label" parent="TopBar/ResourceBar/HBox/ScrapBox/HBox2"]
+layout_mode = 2
+text = "⚙️"
+
+[node name="VBox" type="VBoxContainer" parent="TopBar/ResourceBar/HBox/ScrapBox/HBox2"]
+layout_mode = 2
+theme_override_constants/separation = -2
+
+[node name="ScrapLabel" type="Label" parent="TopBar/ResourceBar/HBox/ScrapBox/HBox2/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.788, 0.635, 0.153, 1)
+theme_override_font_sizes/font_size = 13
+
+[node name="ScrapRate" type="Label" parent="TopBar/ResourceBar/HBox/ScrapBox/HBox2/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.4, 0.1, 0.5)
+theme_override_font_sizes/font_size = 9
+
+[node name="FuelBox" type="PanelContainer" parent="TopBar/ResourceBar/HBox"]
+layout_mode = 2
+
+[node name="FuelBoxStyle" type="StyleBoxFlat" parent="TopBar/ResourceBar/HBox/FuelBox"]
+bg_color = Color(0.05, 0.08, 0.16, 0.9)
+border_color = Color(0.878, 0.439, 0.125, 0.3)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[node name="HBox2" type="HBoxContainer" parent="TopBar/ResourceBar/HBox/FuelBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Icon" type="Label" parent="TopBar/ResourceBar/HBox/FuelBox/HBox2"]
+layout_mode = 2
+text = "⛽"
+
+[node name="VBox" type="VBoxContainer" parent="TopBar/ResourceBar/HBox/FuelBox/HBox2"]
+layout_mode = 2
+theme_override_constants/separation = -2
+
+[node name="FuelLabel" type="Label" parent="TopBar/ResourceBar/HBox/FuelBox/HBox2/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.878, 0.439, 0.125, 1)
+theme_override_font_sizes/font_size = 13
+
+[node name="FuelRate" type="Label" parent="TopBar/ResourceBar/HBox/FuelBox/HBox2/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.25, 0.05, 0.5)
+theme_override_font_sizes/font_size = 9
+
+[node name="IntelBox" type="PanelContainer" parent="TopBar/ResourceBar/HBox"]
+layout_mode = 2
+
+[node name="IntelBoxStyle" type="StyleBoxFlat" parent="TopBar/ResourceBar/HBox/IntelBox"]
+bg_color = Color(0.05, 0.08, 0.16, 0.9)
+border_color = Color(0.251, 0.627, 0.878, 0.3)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 8.0
+content_margin_top = 4.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+
+[node name="HBox2" type="HBoxContainer" parent="TopBar/ResourceBar/HBox/IntelBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Icon" type="Label" parent="TopBar/ResourceBar/HBox/IntelBox/HBox2"]
+layout_mode = 2
+text = "📋"
+
+[node name="VBox" type="VBoxContainer" parent="TopBar/ResourceBar/HBox/IntelBox/HBox2"]
+layout_mode = 2
+theme_override_constants/separation = -2
+
+[node name="IntelLabel" type="Label" parent="TopBar/ResourceBar/HBox/IntelBox/HBox2/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.251, 0.627, 0.878, 1)
+theme_override_font_sizes/font_size = 13
+
+[node name="IntelRate" type="Label" parent="TopBar/ResourceBar/HBox/IntelBox/HBox2/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.15, 0.35, 0.5, 0.5)
+theme_override_font_sizes/font_size = 9
+
+[node name="BottomNav" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -80.0
+
+[node name="BottomNavStyle" type="StyleBoxFlat" parent="BottomNav"]
+bg_color = Color(0.02, 0.03, 0.06, 0.95)
+border_color = Color(0.15, 0.15, 0.2, 0.5)
+border_width_top = 1
+
+[node name="HBox" type="HBoxContainer" parent="BottomNav"]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="NavWar" type="Button" parent="BottomNav/HBox"]
+custom_minimum_size = Vector2(120, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.8)
+theme_override_font_sizes/font_size = 14
+text = "⚔️ العمليات"
+
+[node name="NavMap" type="Button" parent="BottomNav/HBox"]
+custom_minimum_size = Vector2(120, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.5)
+theme_override_font_sizes/font_size = 14
+text = "🗺️ الخريطة"
+
+[node name="NavBarracks" type="Button" parent="BottomNav/HBox"]
+custom_minimum_size = Vector2(120, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.5)
+theme_override_font_sizes/font_size = 14
+text = "🏰 الثكنات"
+
+[node name="BattleOverlay" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+visible = false
+z_index = 100
