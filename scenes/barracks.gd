@@ -1,27 +1,39 @@
 extends Control
 ## ═══════════════════════════════════════════════════════════════
-## الثكنات — تجنيد القوات + البحث والتطوير
+## الثكنات — تجنيد القوات + الضباط + البحث والتطوير
 ## ═══════════════════════════════════════════════════════════════
 
 @onready var tab_barracks: Button = $TabBar/HBox/TabBarracks
+@onready var tab_officers: Button = $TabBar/HBox/TabOfficers
 @onready var tab_research: Button = $TabBar/HBox/TabResearch
 @onready var barracks_content: ScrollContainer = $BarracksContent
+@onready var officers_content: ScrollContainer = $OfficersContent
 @onready var research_content: ScrollContainer = $ResearchContent
 
 func _ready() -> void:
 	tab_barracks.pressed.connect(func(): _show_tab("barracks"))
+	tab_officers.pressed.connect(func(): _show_tab("officers"))
 	tab_research.pressed.connect(func(): _show_tab("research"))
 	game_manager.troops_changed.connect(_build_barracks)
 	game_manager.research_completed.connect(_on_research_done)
+	game_manager.officers_changed.connect(_build_officers)
+	game_manager.resources_changed.connect(_build_officers)
 	_build_barracks()
+	_build_officers()
 	_build_research()
 	_show_tab("barracks")
 
 func _show_tab(tab: String) -> void:
 	barracks_content.visible = tab == "barracks"
+	officers_content.visible = tab == "officers"
 	research_content.visible = tab == "research"
 	tab_barracks.modulate = Color(0.3, 0.9, 0.4) if tab == "barracks" else Color(0.4, 0.4, 0.4)
+	tab_officers.modulate = Color(0.9, 0.8, 0.2) if tab == "officers" else Color(0.4, 0.4, 0.4)
 	tab_research.modulate = Color(0.251, 0.627, 0.878) if tab == "research" else Color(0.4, 0.4, 0.4)
+
+# ═══════════════════════════════════════
+# تبويب القوات
+# ═══════════════════════════════════════
 
 func _build_barracks() -> void:
 	for child in barracks_content.get_children():
@@ -29,13 +41,11 @@ func _build_barracks() -> void:
 	var vbox = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 10)
 	barracks_content.add_child(vbox)
-	# عنوان
 	var title = Label.new()
 	title.text = "🏰 التشكيلات العسكرية"
 	title.add_theme_font_size_override("font_size", 16)
 	title.add_theme_color_override("font_color", Color(0.788, 0.635, 0.153, 1))
 	vbox.add_child(title)
-	# بطاقات الشركات
 	for company in game_manager.companies:
 		var card = _create_company_card(company)
 		vbox.add_child(card)
@@ -51,7 +61,6 @@ func _create_company_card(company: Dictionary) -> PanelContainer:
 	panel.add_theme_stylebox_override("panel", style)
 	var vbox = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 6)
-	# عنوان الشركة
 	var header = HBoxContainer.new()
 	var name_label = Label.new()
 	var ttype: int = company["type"]
@@ -67,17 +76,14 @@ func _create_company_card(company: Dictionary) -> PanelContainer:
 	count_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	header.add_child(count_label)
 	vbox.add_child(header)
-	# معلومات الفرق
 	var stats: Dictionary = game_manager.troop_stats[ttype]
 	var info = Label.new()
 	info.text = "هجوم: %d | دفاع: %d | تكلفة: %d⚙️ + %d⛽" % [stats["attack"], stats["defense"], stats["cost_scrap"], stats["cost_fuel"]]
 	info.add_theme_font_size_override("font_size", 11)
 	info.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4, 1))
 	vbox.add_child(info)
-	# أزرار
 	var btn_box = HBoxContainer.new()
 	btn_box.add_theme_constant_override("separation", 6)
-	# زر إضافة فصيلة
 	var add_btn = Button.new()
 	add_btn.text = "+ فصيلة"
 	add_btn.custom_minimum_size = Vector2(100, 36)
@@ -88,7 +94,6 @@ func _create_company_card(company: Dictionary) -> PanelContainer:
 	add_btn.add_theme_stylebox_override("normal", add_style)
 	add_btn.pressed.connect(func(): game_manager.add_squad(company["id"]))
 	btn_box.add_child(add_btn)
-	# زر تجنيد
 	var recruit_btn = Button.new()
 	recruit_btn.text = "+5 تجنيد"
 	recruit_btn.custom_minimum_size = Vector2(100, 36)
@@ -104,7 +109,6 @@ func _create_company_card(company: Dictionary) -> PanelContainer:
 	)
 	btn_box.add_child(recruit_btn)
 	vbox.add_child(btn_box)
-	# عرض الفصائل
 	for i in range(company["squads"].size()):
 		var squad: Dictionary = company["squads"][i]
 		var sq_label = Label.new()
@@ -115,13 +119,190 @@ func _create_company_card(company: Dictionary) -> PanelContainer:
 	panel.add_child(vbox)
 	return panel
 
+# ═══════════════════════════════════════
+# تبويب الضباط
+# ═══════════════════════════════════════
+
+func _build_officers() -> void:
+	for child in officers_content.get_children():
+		child.queue_free()
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 10)
+	officers_content.add_child(vbox)
+	# عنوان
+	var title = Label.new()
+	title.text = "🎖️ سلسلة القيادة"
+	title.add_theme_font_size_override("font_size", 16)
+	title.add_theme_color_override("font_color", Color(0.9, 0.8, 0.2, 1))
+	vbox.add_child(title)
+	var desc = Label.new()
+	desc.text = "عيّن ضباطاً لتحسين قدرات قواتك في المعركة"
+	desc.add_theme_font_size_override("font_size", 11)
+	desc.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5, 1))
+	vbox.add_child(desc)
+	# عدد الضباط النشطين
+	var active_count = game_manager.get_officer_active_count()
+	var count_label = Label.new()
+	count_label.text = "الضباط النشطون: %d/4" % active_count
+	count_label.add_theme_font_size_override("font_size", 12)
+	count_label.add_theme_color_override("font_color", Color(0.251, 0.627, 0.878, 1))
+	vbox.add_child(count_label)
+	# بطاقات الضباط
+	for officer in game_manager.officers:
+		var card = _create_officer_card(officer)
+		vbox.add_child(card)
+
+func _create_officer_card(officer: Dictionary) -> PanelContainer:
+	var panel = PanelContainer.new()
+	var is_active: bool = officer["active"]
+	var style = StyleBoxFlat.new()
+	if is_active:
+		style.bg_color = Color(0.08, 0.14, 0.08, 0.9)
+		style.border_color = Color(0.3, 0.8, 0.4, 0.4)
+	else:
+		style.bg_color = Color(0.05, 0.08, 0.16, 0.9)
+		style.border_color = Color(0.2, 0.25, 0.35, 0.5)
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(10)
+	style.set_content_margin_all(10)
+	panel.add_theme_stylebox_override("panel", style)
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 6)
+	# الرأس - الأيقونة + الاسم + المستوى
+	var header = HBoxContainer.new()
+	var icon_label = Label.new()
+	icon_label.text = officer["icon"]
+	icon_label.add_theme_font_size_override("font_size", 24)
+	header.add_child(icon_label)
+	var name_box = VBoxContainer.new()
+	name_box.add_theme_constant_override("separation", -2)
+	name_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var name_label = Label.new()
+	name_label.text = officer["name"]
+	name_label.add_theme_font_size_override("font_size", 15)
+	if is_active:
+		name_label.add_theme_color_override("font_color", Color(0.3, 0.9, 0.4, 1))
+	else:
+		name_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7, 1))
+	name_box.add_child(name_label)
+	var level_label = Label.new()
+	if is_active:
+		level_label.text = "المستوى %d/%d" % [officer["level"], officer["max_level"]]
+		level_label.add_theme_color_override("font_color", Color(0.9, 0.8, 0.2, 1))
+	else:
+		level_label.text = "غير معيّن"
+		level_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5, 1))
+	level_label.add_theme_font_size_override("font_size", 11)
+	name_box.add_child(level_label)
+	header.add_child(name_box)
+	vbox.add_child(header)
+	# الوصف
+	var desc_label = Label.new()
+	desc_label.text = officer["desc"]
+	desc_label.add_theme_font_size_override("font_size", 11)
+	desc_label.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4, 1))
+	vbox.add_child(desc_label)
+	# التأثير الحالي
+	if is_active:
+		var current_effect: float = officer["effect_per_level"] * officer["level"]
+		var effect_label = Label.new()
+		var stat_name = "هجوم" if officer["effect_type"] in ["attack", "all_attack"] else "دفاع"
+		if officer["troop_type"] == -1:
+			effect_label.text = "📊 التأثير الحالي: +%d%% %s لجميع القوات" % [int(current_effect * 100), stat_name]
+		else:
+			var troop_name = ["المشاة", "المدرعات", "الطيران"][officer["troop_type"]]
+			effect_label.text = "📊 التأثير الحالي: +%d%% %s %s" % [int(current_effect * 100), stat_name, troop_name]
+		effect_label.add_theme_font_size_override("font_size", 11)
+		effect_label.add_theme_color_override("font_color", Color(0.251, 0.627, 0.878, 1))
+		vbox.add_child(effect_label)
+	# شريط التقدم
+	if is_active:
+		var prog_hbox = HBoxContainer.new()
+		var prog_label = Label.new()
+		prog_label.text = "تقدم: "
+		prog_label.add_theme_font_size_override("font_size", 10)
+		prog_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5, 1))
+		prog_hbox.add_child(prog_label)
+		for lvl in range(officer["max_level"]):
+			var dot = Label.new()
+			if lvl < officer["level"]:
+				dot.text = "🟢"
+			else:
+				dot.text = "⚫"
+			dot.add_theme_font_size_override("font_size", 8)
+			prog_hbox.add_child(dot)
+		vbox.add_child(prog_hbox)
+	# الأزرار
+	var btn_box = HBoxContainer.new()
+	btn_box.add_theme_constant_override("separation", 8)
+	if not is_active:
+		var hire_btn = Button.new()
+		var cost: int = officer["cost"]
+		var can_afford: bool = game_manager.scrap >= cost
+		hire_btn.text = "🎖️ تعيين (%d⚙️)" % cost
+		hire_btn.custom_minimum_size = Vector2(180, 38)
+		hire_btn.add_theme_font_size_override("font_size", 12)
+		var hire_style = StyleBoxFlat.new()
+		if can_afford:
+			hire_style.bg_color = Color(0.251, 0.627, 0.878, 1)
+		else:
+			hire_style.bg_color = Color(0.2, 0.2, 0.25, 0.8)
+		hire_style.set_corner_radius_all(6)
+		hire_btn.add_theme_stylebox_override("normal", hire_style)
+		if can_afford:
+			hire_btn.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+		else:
+			hire_btn.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4, 1))
+		hire_btn.pressed.connect(func():
+			game_manager.hire_officer(officer["id"])
+			_build_officers()
+		)
+		btn_box.add_child(hire_btn)
+	else:
+		# زر ترقية
+		if officer["level"] < officer["max_level"]:
+			var upg_cost: int = int(officer["cost"] * pow(1.3, officer["level"]))
+			var can_upg: bool = game_manager.scrap >= upg_cost
+			var upg_btn = Button.new()
+			upg_btn.text = "⬆️ ترقية (%d⚙️)" % upg_cost
+			upg_btn.custom_minimum_size = Vector2(180, 38)
+			upg_btn.add_theme_font_size_override("font_size", 12)
+			var upg_style = StyleBoxFlat.new()
+			if can_upg:
+				upg_style.bg_color = Color(0.2, 0.7, 0.3, 1)
+			else:
+				upg_style.bg_color = Color(0.2, 0.2, 0.25, 0.8)
+			upg_style.set_corner_radius_all(6)
+			upg_btn.add_theme_stylebox_override("normal", upg_style)
+			if can_upg:
+				upg_btn.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+			else:
+				upg_btn.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4, 1))
+			upg_btn.pressed.connect(func():
+				game_manager.upgrade_officer(officer["id"])
+				_build_officers()
+			)
+			btn_box.add_child(upg_btn)
+		else:
+			var max_label = Label.new()
+			max_label.text = "🏆 المستوى الأقصى!"
+			max_label.add_theme_font_size_override("font_size", 12)
+			max_label.add_theme_color_override("font_color", Color(0.9, 0.8, 0.2, 1))
+			btn_box.add_child(max_label)
+	vbox.add_child(btn_box)
+	panel.add_child(vbox)
+	return panel
+
+# ═══════════════════════════════════════
+# تبويب البحث
+# ═══════════════════════════════════════
+
 func _build_research() -> void:
 	for child in research_content.get_children():
 		child.queue_free()
 	var vbox = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 8)
 	research_content.add_child(vbox)
-	# عنوان
 	var title = Label.new()
 	title.text = "🔬 البحث والتطوير"
 	title.add_theme_font_size_override("font_size", 16)
@@ -134,7 +315,6 @@ func _build_research() -> void:
 		prog_label.add_theme_font_size_override("font_size", 13)
 		prog_label.add_theme_color_override("font_color", Color(0.788, 0.635, 0.153, 1))
 		vbox.add_child(prog_label)
-	# بطاقات التقنيات
 	for tech in game_manager.tech_tree:
 		var card = _create_tech_card(tech)
 		vbox.add_child(card)
@@ -159,7 +339,6 @@ func _create_tech_card(tech: Dictionary) -> PanelContainer:
 	panel.add_theme_stylebox_override("panel", style)
 	var vbox = VBoxContainer.new()
 	vbox.add_theme_constant_override("separation", 4)
-	# العنوان
 	var header = Label.new()
 	header.text = "%s %s (الطبقة %d)" % [tech["icon"], tech["name"], tech["tier"]]
 	header.add_theme_font_size_override("font_size", 14)
@@ -168,19 +347,16 @@ func _create_tech_card(tech: Dictionary) -> PanelContainer:
 	else:
 		header.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7, 1))
 	vbox.add_child(header)
-	# الوصف
 	var desc = Label.new()
 	desc.text = tech["desc"]
 	desc.add_theme_font_size_override("font_size", 11)
 	desc.add_theme_color_override("font_color", Color(0.4, 0.4, 0.4, 1))
 	vbox.add_child(desc)
-	# التكلفة
 	var cost = Label.new()
 	cost.text = "التكلفة: %d⚙️ + %d📋 | الوقت: %dث" % [tech["cost_scrap"], tech["cost_intel"], int(tech["time"])]
 	cost.add_theme_font_size_override("font_size", 11)
 	cost.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5, 1))
 	vbox.add_child(cost)
-	# زر البحث
 	if not completed and can_do:
 		var btn = Button.new()
 		btn.text = "🔬 بحث"

@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scenes/world_map.gd" id="1_wm"]
 
@@ -27,6 +27,13 @@ corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_attack_map_btn"]
 bg_color = Color(0.937, 0.267, 0.267, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fort_btn"]
+bg_color = Color(0.2, 0.7, 0.3, 1)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
@@ -73,7 +80,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = 44.0
-offset_bottom = 170.0
+offset_bottom = -220.0
 
 [node name="GridContainer" type="GridContainer" parent="ScrollContainer"]
 layout_mode = 2
@@ -86,7 +93,7 @@ anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -170.0
+offset_top = -220.0
 visible = false
 theme_override_styles/panel = SubResource("StyleBoxFlat_info_panel")
 
@@ -111,22 +118,33 @@ theme_override_font_sizes/font_size = 13
 layout_mode = 2
 theme_override_font_sizes/font_size = 13
 
+[node name="FortLabel" type="Label" parent="InfoPanel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+visible = false
+
 [node name="BtnBox" type="HBoxContainer" parent="InfoPanel/VBox"]
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
 [node name="ScoutBtn" type="Button" parent="InfoPanel/VBox/BtnBox"]
-custom_minimum_size = Vector2(140, 40)
+custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_scout_btn")
 text = "🔍 استطلاع (-15📋)"
 
 [node name="AttackMapBtn" type="Button" parent="InfoPanel/VBox/BtnBox"]
-custom_minimum_size = Vector2(140, 40)
+custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.05, 0.03, 0.06, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 12
 theme_override_styles/normal = SubResource("StyleBoxFlat_attack_map_btn")
 text = "⚔️ هجوم!"
+
+[node name="FortBox" type="HBoxContainer" parent="InfoPanel/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+visible = false

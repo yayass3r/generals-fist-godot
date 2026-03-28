@@ -1,0 +1,206 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/campaign.gd" id="1_camp"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top_bar"]
+bg_color = Color(0.04, 0.06, 0.12, 0.95)
+border_color = Color(0.15, 0.15, 0.2, 0.5)
+border_width_bottom = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_skill_panel"]
+bg_color = Color(0.04, 0.06, 0.12, 0.97)
+border_color = Color(0.788, 0.635, 0.153, 0.5)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_story_panel"]
+bg_color = Color(0.04, 0.06, 0.12, 0.97)
+border_color = Color(0.2, 0.4, 0.6, 0.5)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+
+[node name="Campaign" type="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Bg" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.03, 0.04, 0.08, 1)
+
+[node name="TopBar" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 50.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_top_bar")
+
+[node name="HBox" type="HBoxContainer" parent="TopBar"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="LevelLabel" type="Label" parent="TopBar/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.788, 0.635, 0.153, 1)
+theme_override_font_sizes/font_size = 14
+
+[node name="XpBar" type="ProgressBar" parent="TopBar/HBox"]
+custom_minimum_size = Vector2(100, 14)
+layout_mode = 2
+max_value = 100.0
+value = 0.0
+theme_override_styles/background = SubResource("StyleBoxFlat_top_bar")
+show_percentage = false
+
+[node name="XpLabel" type="Label" parent="TopBar/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 10
+
+[node name="StarsLabel" type="Label" parent="TopBar/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.788, 0.635, 0.153, 1)
+theme_override_font_sizes/font_size = 13
+
+[node name="SkillBtn" type="Button" parent="TopBar/HBox"]
+custom_minimum_size = Vector2(90, 30)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 11
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 54.0
+
+[node name="StagesContainer" type="VBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="StoryPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -170.0
+offset_top = -180.0
+offset_right = 170.0
+offset_bottom = 180.0
+visible = false
+z_index = 10
+theme_override_styles/panel = SubResource("StyleBoxFlat_story_panel")
+
+[node name="VBox" type="VBoxContainer" parent="StoryPanel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="StoryTitle" type="Label" parent="StoryPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.788, 0.635, 0.153, 1)
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+
+[node name="StoryText" type="Label" parent="StoryPanel/VBox"]
+layout_mode = 2
+autowrap_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.75, 0.75, 1)
+theme_override_font_sizes/font_size = 11
+
+[node name="StoryStartBtn" type="Button" parent="StoryPanel/VBox"]
+custom_minimum_size = Vector2(160, 44)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.05, 0.03, 0.06, 1)
+theme_override_font_sizes/font_size = 16
+
+[node name="StoryCloseBtn" type="Button" parent="StoryPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 12
+text = "✕ إغلاق"
+
+[node name="SkillPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -160.0
+offset_right = 150.0
+offset_bottom = 160.0
+visible = false
+z_index = 10
+theme_override_styles/panel = SubResource("StyleBoxFlat_skill_panel")
+
+[node name="VBox" type="VBoxContainer" parent="SkillPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="PointsLabel" type="Label" parent="SkillPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.788, 0.635, 0.153, 1)
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+
+[node name="AttackBtn" type="Button" parent="SkillPanel/VBox"]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 11
+
+[node name="DefenseBtn" type="Button" parent="SkillPanel/VBox"]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.6, 0.9, 1)
+theme_override_font_sizes/font_size = 11
+
+[node name="ProductionBtn" type="Button" parent="SkillPanel/VBox"]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.8, 0.4, 1)
+theme_override_font_sizes/font_size = 11
+
+[node name="MoraleBtn" type="Button" parent="SkillPanel/VBox"]
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.7, 0.3, 1)
+theme_override_font_sizes/font_size = 11
+
+[node name="SkillCloseBtn" type="Button" parent="SkillPanel/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 12
+text = "✕ إغلاق"

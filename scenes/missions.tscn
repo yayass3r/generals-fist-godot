@@ -1,0 +1,92 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scenes/missions.gd" id="1_ms"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_bar"]
+bg_color = Color(0.04, 0.06, 0.12, 0.9)
+border_color = Color(0.15, 0.15, 0.2, 0.5)
+border_width_bottom = 1
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_daily_panel"]
+bg_color = Color(0.04, 0.06, 0.12, 0.95)
+border_color = Color(0.251, 0.627, 0.878, 0.3)
+border_width_top = 1
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_weekly_panel"]
+bg_color = Color(0.04, 0.06, 0.12, 0.95)
+border_color = Color(0.9, 0.7, 0.2, 0.3)
+border_width_top = 1
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+
+[node name="Missions" type="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Bg" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.03, 0.04, 0.08, 1)
+
+[node name="TabBar" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 44.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_tab_bar")
+
+[node name="HBox" type="HBoxContainer" parent="TabBar"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="TabDaily" type="Button" parent="TabBar/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.251, 0.627, 0.878, 1)
+theme_override_font_sizes/font_size = 15
+text = "📅 يومية"
+
+[node name="TabWeekly" type="Button" parent="TabBar/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 15
+text = "📆 أسبوعية"
+
+[node name="DailyContent" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 48.0
+
+[node name="DailyVBox" type="VBoxContainer" parent="DailyContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="WeeklyContent" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 48.0
+visible = false
+
+[node name="WeeklyVBox" type="VBoxContainer" parent="WeeklyContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8

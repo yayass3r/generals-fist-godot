@@ -1,6 +1,6 @@
 extends Control
 ## ═══════════════════════════════════════════════════════════════
-## جذر اللعبة — التنقل بين الشاشات + شريط الموارد
+## جذر اللعبة — التنقل بين الشاشات + شريط الموارد + المستوى
 ## ═══════════════════════════════════════════════════════════════
 
 @onready var content_container: Control = $ContentContainer
@@ -10,34 +10,42 @@ extends Control
 @onready var scrap_rate: Label = $TopBar/ResourceBar/HBox/ScrapRate
 @onready var fuel_rate: Label = $TopBar/ResourceBar/HBox/FuelRate
 @onready var intel_rate: Label = $TopBar/ResourceBar/HBox/IntelRate
+@onready var level_badge: Label = $TopBar/ResourceBar/HBox/LevelBadge
 @onready var nav_war: Button = $BottomNav/HBox/NavWar
 @onready var nav_map: Button = $BottomNav/HBox/NavMap
 @onready var nav_barracks: Button = $BottomNav/HBox/NavBarracks
+@onready var nav_campaign: Button = $BottomNav/HBox/NavCampaign
+@onready var nav_missions: Button = $BottomNav/HBox/NavMissions
 @onready var battle_overlay: Control = $BattleOverlay
+@onready var event_popup: PanelContainer = $EventPopup
+@onready var event_icon: Label = $EventPopup/VBox/EventIcon
+@onready var event_title: Label = $EventPopup/VBox/EventTitle
+@onready var event_desc: Label = $EventPopup/VBox/EventDesc
+@onready var event_close: Button = $EventPopup/VBox/EventClose
 
 var current_scene: Control = null
 
 func _ready() -> void:
-	# ربط الإشارات
 	game_manager.resources_changed.connect(_update_resources)
 	game_manager.screen_changed.connect(_update_nav_highlight)
+	game_manager.level_up.connect(_update_resources)
 	game_manager.battle_started.connect(_on_battle_started)
 	game_manager.battle_ended.connect(_on_battle_ended)
-	# أزرار التنقل
+	game_manager.random_event_occurred.connect(_on_random_event)
 	nav_war.pressed.connect(func(): _switch_screen("war_room"))
 	nav_map.pressed.connect(func(): _switch_screen("world_map"))
 	nav_barracks.pressed.connect(func(): _switch_screen("barracks"))
-	# تحميل الشاشة الافتراضية
+	nav_campaign.pressed.connect(func(): _switch_screen("campaign"))
+	nav_missions.pressed.connect(func(): _switch_screen("missions"))
+	event_close.pressed.connect(func(): event_popup.visible = false)
 	_switch_screen("war_room")
 	_update_resources()
 
 func _switch_screen(screen_name: String) -> void:
 	game_manager.current_screen = screen_name
-	# حذف المشهد الحالي
 	if current_scene:
 		current_scene.queue_free()
 		current_scene = null
-	# تحميل المشهد الجديد
 	var scene_path := ""
 	match screen_name:
 		"war_room":
@@ -46,6 +54,10 @@ func _switch_screen(screen_name: String) -> void:
 			scene_path = "res://scenes/world_map.tscn"
 		"barracks":
 			scene_path = "res://scenes/barracks.tscn"
+		"campaign":
+			scene_path = "res://scenes/campaign.tscn"
+		"missions":
+			scene_path = "res://scenes/missions.tscn"
 	if scene_path != "":
 		var scene = load(scene_path)
 		current_scene = scene.instantiate()
@@ -59,11 +71,14 @@ func _update_resources() -> void:
 	scrap_rate.text = "+%d/ث" % int(prod["scrap"]) if prod["scrap"] > 0 else ""
 	fuel_rate.text = "+%d/ث" % int(prod["fuel"]) if prod["fuel"] > 0 else ""
 	intel_rate.text = "+%.1f/ث" % prod["intel"] if prod["intel"] > 0 else ""
+	level_badge.text = "⭐%d" % game_manager.player_level
 
 func _update_nav_highlight(screen: String) -> void:
 	nav_war.modulate = Color(1, 0.85, 0.2) if screen == "war_room" else Color(0.5, 0.5, 0.5)
 	nav_map.modulate = Color(0.3, 0.7, 0.95) if screen == "world_map" else Color(0.5, 0.5, 0.5)
 	nav_barracks.modulate = Color(0.3, 0.9, 0.4) if screen == "barracks" else Color(0.5, 0.5, 0.5)
+	nav_campaign.modulate = Color(0.9, 0.7, 0.2) if screen == "campaign" else Color(0.5, 0.5, 0.5)
+	nav_missions.modulate = Color(0.251, 0.627, 0.878) if screen == "missions" else Color(0.5, 0.5, 0.5)
 
 func _on_battle_started() -> void:
 	battle_overlay.visible = true
@@ -77,4 +92,18 @@ func _on_battle_ended(_won: bool, _loot: Dictionary) -> void:
 	for child in battle_overlay.get_children():
 		child.queue_free()
 	battle_overlay.visible = false
-	_switch_screen("war_room")
+	if game_manager.battle_is_campaign:
+		_switch_screen("campaign")
+	else:
+		_switch_screen("war_room")
+
+func _on_random_event(event: Dictionary) -> void:
+	event_popup.visible = true
+	event_icon.text = str(event.get("icon", "📢"))
+	event_title.text = str(event.get("name", "حدث!"))
+	event_desc.text = str(event.get("desc", ""))
+	var is_positive: bool = event.get("scrap", 0) > 0 or event.get("amount", 0) > 0 or event.get("fuel", 0) > 0
+	if is_positive:
+		event_title.add_theme_color_override("font_color", Color(0.2, 0.8, 0.3, 1))
+	else:
+		event_title.add_theme_color_override("font_color", Color(0.9, 0.3, 0.3, 1))
