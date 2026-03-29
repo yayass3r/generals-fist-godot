@@ -6,7 +6,7 @@ config_version=5
 [application]
 config/name="قبضة الجنرال"
 config/description="لعبة استراتيجية Idle عسكرية - غرفة العمليات والمعارك التكتيكية"
-config/version="1.0.0"
+config/version="2.1.0"
 config/icon="res://icon.png"
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")

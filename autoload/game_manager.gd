@@ -1438,7 +1438,7 @@ func update_research(delta: float) -> void:
                                 research_in_progress = ""
                                 research_progress = 0.0
                                 check_achievements()
-				save_game()
+                                save_game()
                         return
 
 var _tech_attack_bonus: float = 0.0
@@ -1818,17 +1818,17 @@ func load_game() -> bool:
         fuel = data.get("fuel", 300)
         intel = data.get("intel", 100)
         if data.has("buildings"):
-                buildings = data["buildings"]
+                buildings.assign(data["buildings"])
         if data.has("companies"):
-                companies = data["companies"]
+                companies.assign(data["companies"])
         if data.has("deployment"):
                 deployment = data["deployment"]
         if data.has("world_sectors"):
-                world_sectors = data["world_sectors"]
+                world_sectors.assign(data["world_sectors"])
         selected_terrain = data.get("selected_terrain", Terrain.PLAINS)
         current_weather = data.get("current_weather", Weather.CLEAR)
         player_morale = data.get("player_morale", 70.0)
-        completed_techs = data.get("completed_techs", [])
+        if data.has("completed_techs"): completed_techs.assign(data["completed_techs"])
         last_online_time = data.get("last_online_time", 0)
         # استعادة المستوى
         player_level = data.get("player_level", 1)
@@ -1848,19 +1848,19 @@ func load_game() -> bool:
                                 break
         recalculate_tech_bonuses()
         # استعادة أنظمة L2
-        officers = data.get("officers", officers)
-        fortifications = data.get("fortifications", fortifications)
-        daily_missions = data.get("daily_missions", daily_missions)
-        weekly_missions = data.get("weekly_missions", weekly_missions)
+        if data.has("officers"): officers.assign(data["officers"])
+        if data.has("fortifications"): fortifications.assign(data["fortifications"])
+        if data.has("daily_missions"): daily_missions.assign(data["daily_missions"])
+        if data.has("weekly_missions"): weekly_missions.assign(data["weekly_missions"])
         last_daily_refresh = data.get("last_daily_refresh", 0)
         last_weekly_refresh = data.get("last_weekly_refresh", 0)
         # استعادة أنظمة L3
-        troop_upgrades = data.get("troop_upgrades", troop_upgrades)
-        active_convoys = data.get("active_convoys", active_convoys)
+        if data.has("troop_upgrades"): troop_upgrades = data["troop_upgrades"]
+        if data.has("active_convoys"): active_convoys.assign(data["active_convoys"])
         completed_convoys_count = data.get("completed_convoys_count", 0)
         # استعادة أنظمة L4
-        achievements = data.get("achievements", achievements)
-        settings = data.get("settings", settings)
+        if data.has("achievements"): achievements.assign(data["achievements"])
+        if data.has("settings"): settings = data["settings"]
         total_battles_won = data.get("total_battles_won", 0)
         total_battles_lost = data.get("total_battles_lost", 0)
         consecutive_wins = data.get("consecutive_wins", 0)
