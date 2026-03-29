@@ -27,6 +27,10 @@ signal random_event_occurred(event: Dictionary)
 signal weather_changed(new_weather: int)
 signal convoys_updated
 signal troop_upgrades_changed
+signal achievements_changed
+signal achievement_unlocked(achievement_id: String)
+signal settings_changed
+signal tutorial_step_changed(step: int)
 
 # ─── ثوابت الألوان ───
 const COLOR_BG := Color(0.02, 0.03, 0.06, 1.0)
@@ -378,6 +382,7 @@ func hire_officer(officer_id: String) -> bool:
                                 o["active"] = true
                                 o["level"] = 1
                                 officers_changed.emit()
+                                check_achievements()
                                 return true
         return false
 
@@ -391,6 +396,7 @@ func upgrade_officer(officer_id: String) -> bool:
                                 scrap -= cost
                                 o["level"] += 1
                                 officers_changed.emit()
+                                check_achievements()
                                 return true
         return false
 
@@ -450,6 +456,7 @@ func build_fortification(sector_id: String, fort_type: String) -> bool:
                                 "sector_id": sector_id, "type": fort_type, "level": 1,
                         })
                         fortifications_changed.emit()
+                        check_achievements()
                         return true
         return false
 
@@ -798,6 +805,7 @@ func launch_convoy(scrap_amount: int, fuel_amount: int, intel_amount: int) -> bo
                 "raided": false,
         })
         convoys_updated.emit()
+        check_achievements()
         return true
 
 func update_convoys(delta: float) -> void:
@@ -818,6 +826,7 @@ func update_convoys(delta: float) -> void:
                         completed_convoys_count += 1
                         active_convoys.remove_at(i)
                         convoys_updated.emit()
+                        check_achievements()
 
 func get_active_convoy_count() -> int:
         return active_convoys.size()
@@ -966,6 +975,7 @@ func upgrade_building(building_id: String) -> bool:
                                 b["level"] = b["level"] + 1
                                 buildings_changed.emit()
                                 track_upgrade()
+                                check_achievements()
                                 return true
         return false
 
@@ -1039,6 +1049,7 @@ func recruit_troops(company_id: String, squad_index: int, count: int) -> int:
                                 squad["size"] += available
                                 troops_changed.emit()
                                 track_recruit()
+                                check_achievements()
                                 return available
         return 0
 
@@ -1228,6 +1239,8 @@ func end_battle(won: bool) -> void:
         var loot := {"scrap": 0, "fuel": 0, "intel": 0, "troops_lost": 0, "xp_gained": 0, "stars": 0}
 
         if won:
+                total_battles_won += 1
+                consecutive_wins += 1
                 var base: int = battle_data["enemy_power"]
                 loot["scrap"] = base * 2
                 loot["fuel"] = base
@@ -1235,6 +1248,9 @@ func end_battle(won: bool) -> void:
                 scrap += loot["scrap"]
                 fuel += loot["fuel"]
                 intel += loot["intel"]
+                total_scrap_earned += loot["scrap"]
+                total_fuel_earned += loot["fuel"]
+                total_intel_earned += loot["intel"]
                 battle_data["log"].append("🏆 نصر! غنائم: %d خردة, %d وقود, %d معلومات" % [loot["scrap"], loot["fuel"], loot["intel"]])
 
                 if battle_target_sector_id != "":
@@ -1254,6 +1270,8 @@ func end_battle(won: bool) -> void:
                 # XP من المعركة
                 loot["xp_gained"] = add_xp(base, "battle")
         else:
+                total_battles_lost += 1
+                consecutive_wins = 0
                 battle_data["log"].append("💔 هزيمة...")
                 var loss_loss_rate: float = 0.30 + randf() * 0.20
                 loot["troops_lost"] = _apply_battle_losses(deployed_count, loss_loss_rate)
@@ -1272,6 +1290,7 @@ func end_battle(won: bool) -> void:
         clear_deployment()
         battle_ended.emit(won, loot)
         track_battle()
+        check_achievements()
         save_game()
 
 func _apply_battle_losses(total_deployed: int, loss_rate: float) -> int:
@@ -1418,7 +1437,8 @@ func update_research(delta: float) -> void:
                                 add_xp(50, "research")
                                 research_in_progress = ""
                                 research_progress = 0.0
-                                save_game()
+                                check_achievements()
+				save_game()
                         return
 
 var _tech_attack_bonus: float = 0.0
@@ -1477,6 +1497,261 @@ func _idle_tick(delta: float) -> void:
                                 fuel += int(fort_prod["fuel"])
                                 intel += int(fort_prod["intel"])
 
+# ═══════════════════════════════════════════════════
+# نظام الإنجازات
+# ═══════════════════════════════════════════════════
+var achievements: Array[Dictionary] = []
+var total_battles_won: int = 0
+var total_battles_lost: int = 0
+var consecutive_wins: int = 0
+
+func _init_achievements() -> void:
+        achievements = [
+                # ─── قتال (6) ───
+                {"id": "first_blood", "name": "الدم الأول", "icon": "🗡️", "desc": "فُز بأول معركة", "category": "combat",
+                 "reward": {"scrap": 100, "fuel": 50, "xp": 30}, "completed": false, "claimed": false},
+                {"id": "veteran", "name": "المحارب المخضرم", "icon": "⚔️", "desc": "فُز بـ 10 معارك", "category": "combat",
+                 "reward": {"scrap": 300, "fuel": 150, "xp": 100}, "completed": false, "claimed": false},
+                {"id": "warlord", "name": "سيد الحرب", "icon": "💀", "desc": "فُز بـ 50 معارك", "category": "combat",
+                 "reward": {"scrap": 1000, "fuel": 500, "xp": 300}, "completed": false, "claimed": false},
+                {"id": "boss_slayer", "name": "قاتل الزعماء", "icon": "👹", "desc": "هزم أول Boss", "category": "combat",
+                 "reward": {"scrap": 500, "fuel": 250, "xp": 150}, "completed": false, "claimed": false},
+                {"id": "undefeated", "name": "لا يُقهر", "icon": "🏆", "desc": "فُز بـ 5 معارك متتالية", "category": "combat",
+                 "reward": {"scrap": 400, "fuel": 200, "xp": 120}, "completed": false, "claimed": false},
+                {"id": "perfect_battle", "name": "معركة مثالية", "icon": "⭐", "desc": "احصل على 3 نجوم في أي مرحلة حملة", "category": "combat",
+                 "reward": {"scrap": 600, "fuel": 300, "xp": 200}, "completed": false, "claimed": false},
+                # ─── اقتصاد (5) ───
+                {"id": "scrap_hoarder", "name": "جامع الخردة", "icon": "⚙️", "desc": "اجمع 5000 خردة", "category": "economy",
+                 "reward": {"scrap": 500, "fuel": 200, "xp": 100}, "completed": false, "claimed": false},
+                {"id": "fuel_reserve", "name": "احتياطي الوقود", "icon": "⛽", "desc": "اجمع 3000 وقود", "category": "economy",
+                 "reward": {"scrap": 200, "fuel": 500, "xp": 100}, "completed": false, "claimed": false},
+                {"id": "intel_master", "name": "سيد الاستخبارات", "icon": "📋", "desc": "اجمع 1500 معلومات", "category": "economy",
+                 "reward": {"scrap": 300, "fuel": 300, "xp": 150}, "completed": false, "claimed": false},
+                {"id": "builder", "name": "المهندس", "icon": "🏗️", "desc": "رقِّ أي منشأة 5 مرات", "category": "economy",
+                 "reward": {"scrap": 400, "fuel": 200, "xp": 120}, "completed": false, "claimed": false},
+                {"id": "convoy_master", "name": "سيد القوافل", "icon": "🚛", "desc": "أكمل 10 قوافل", "category": "economy",
+                 "reward": {"scrap": 500, "fuel": 300, "xp": 150}, "completed": false, "claimed": false},
+                # ─── حملات (5) ───
+                {"id": "campaign_start", "name": "بداية الرحلة", "icon": "📖", "desc": "أكمل المرحلة 1 من الحملة", "category": "campaign",
+                 "reward": {"scrap": 200, "fuel": 100, "xp": 50}, "completed": false, "claimed": false},
+                {"id": "chapter1_done", "name": "نهاية الفصل الأول", "icon": "📕", "desc": "أكمل المرحلة 5 من الحملة", "category": "campaign",
+                 "reward": {"scrap": 400, "fuel": 200, "xp": 150}, "completed": false, "claimed": false},
+                {"id": "chapter2_done", "name": "نهاية الفصل الثاني", "icon": "📗", "desc": "أكمل المرحلة 10 من الحملة", "category": "campaign",
+                 "reward": {"scrap": 600, "fuel": 300, "xp": 200}, "completed": false, "claimed": false},
+                {"id": "chapter3_done", "name": "نهاية الفصل الثالث", "icon": "📘", "desc": "أكمل المرحلة 15 من الحملة", "category": "campaign",
+                 "reward": {"scrap": 800, "fuel": 400, "xp": 300}, "completed": false, "claimed": false},
+                {"id": "conqueror", "name": "الفاتح", "icon": "👑", "desc": "أكمل كل 25 مرحلة حملة", "category": "campaign",
+                 "reward": {"scrap": 2000, "fuel": 1000, "xp": 500}, "completed": false, "claimed": false},
+                # ─── عسكري (4) ───
+                {"id": "army_100", "name": "جيش المئة", "icon": "🎖️", "desc": "اجمع 100 جندي", "category": "military",
+                 "reward": {"scrap": 300, "fuel": 150, "xp": 100}, "completed": false, "claimed": false},
+                {"id": "all_officers", "name": "طاقم كامل", "icon": "🪖", "desc": "عيّن كل الـ 4 ضباط", "category": "military",
+                 "reward": {"scrap": 500, "fuel": 250, "xp": 150}, "completed": false, "claimed": false},
+                {"id": "max_officer", "name": "قائد متمرس", "icon": "🏅", "desc": "رقِّ أي ضابط للمستوى 10", "category": "military",
+                 "reward": {"scrap": 800, "fuel": 400, "xp": 250}, "completed": false, "claimed": false},
+                {"id": "fort_builder", "name": "بناة التحصينات", "icon": "🏰", "desc": "ابنِ 5 تحصينات", "category": "military",
+                 "reward": {"scrap": 400, "fuel": 200, "xp": 120}, "completed": false, "claimed": false},
+                # ─── اجتماعي (4) ───
+                {"id": "first_convoy", "name": "أول قافلة", "icon": "🚚", "desc": "أطلق أول قافلة إمداد", "category": "social",
+                 "reward": {"scrap": 100, "fuel": 50, "xp": 30}, "completed": false, "claimed": false},
+                {"id": "first_fort", "name": "أول تحصين", "icon": "🏗️", "desc": "ابنِ أول تحصين", "category": "social",
+                 "reward": {"scrap": 100, "fuel": 50, "xp": 30}, "completed": false, "claimed": false},
+                {"id": "first_officer", "name": "أول ضابط", "icon": "🎖️", "desc": "عيّن أول ضابط", "category": "social",
+                 "reward": {"scrap": 100, "fuel": 50, "xp": 30}, "completed": false, "claimed": false},
+                {"id": "first_research", "name": "أول بحث", "icon": "🔬", "desc": "أكمل أول بحث علمي", "category": "social",
+                 "reward": {"scrap": 100, "fuel": 50, "xp": 30}, "completed": false, "claimed": false},
+        ]
+
+func check_achievements() -> void:
+        for a in achievements:
+                if a["completed"]:
+                        continue
+                var met := false
+                match a["id"]:
+                        "first_blood":
+                                met = total_battles_won >= 1
+                        "veteran":
+                                met = total_battles_won >= 10
+                        "warlord":
+                                met = total_battles_won >= 50
+                        "boss_slayer":
+                                met = _has_beaten_boss()
+                        "undefeated":
+                                met = consecutive_wins >= 5
+                        "perfect_battle":
+                                met = _has_3_star_stage()
+                        "scrap_hoarder":
+                                met = scrap >= 5000
+                        "fuel_reserve":
+                                met = fuel >= 3000
+                        "intel_master":
+                                met = intel >= 1500
+                        "builder":
+                                met = _max_building_level() >= 6
+                        "convoy_master":
+                                met = completed_convoys_count >= 10
+                        "campaign_start":
+                                met = current_campaign_stage >= 1
+                        "chapter1_done":
+                                met = current_campaign_stage >= 5
+                        "chapter2_done":
+                                met = current_campaign_stage >= 10
+                        "chapter3_done":
+                                met = current_campaign_stage >= 15
+                        "conqueror":
+                                met = current_campaign_stage >= 25
+                        "army_100":
+                                met = _get_total_troops() >= 100
+                        "all_officers":
+                                met = get_officer_active_count() >= 4
+                        "max_officer":
+                                met = _has_max_level_officer()
+                        "fort_builder":
+                                met = fortifications.size() >= 5
+                        "first_convoy":
+                                met = completed_convoys_count >= 1
+                        "first_fort":
+                                met = fortifications.size() >= 1
+                        "first_officer":
+                                met = get_officer_active_count() >= 1
+                        "first_research":
+                                met = completed_techs.size() >= 1
+                if met:
+                        a["completed"] = true
+                        achievement_unlocked.emit(a["id"])
+                        achievements_changed.emit()
+
+func claim_achievement(achievement_id: String) -> bool:
+        for a in achievements:
+                if a["id"] == achievement_id and a["completed"] and not a["claimed"]:
+                        a["claimed"] = true
+                        var r: Dictionary = a["reward"]
+                        scrap += r.get("scrap", 0)
+                        fuel += r.get("fuel", 0)
+                        add_xp(r.get("xp", 0), "achievement")
+                        achievements_changed.emit()
+                        return true
+        return false
+
+func _has_beaten_boss() -> bool:
+        for s in campaign_stages:
+                if s.get("is_boss", false) and s.get("first_completed", false):
+                        return true
+        return false
+
+func _has_3_star_stage() -> bool:
+        for s in campaign_stages:
+                if s.get("stars_earned", 0) >= 3:
+                        return true
+        return false
+
+func _max_building_level() -> int:
+        var max_lvl := 0
+        for b in buildings:
+                if b["level"] > max_lvl:
+                        max_lvl = b["level"]
+        return max_lvl
+
+func _get_total_troops() -> int:
+        var total := 0
+        for c in companies:
+                total += get_company_troop_count(c)
+        return total
+
+func _has_max_level_officer() -> bool:
+        for o in officers:
+                if o["active"] and o["level"] >= o["max_level"]:
+                        return true
+        return false
+
+# ═══════════════════════════════════════════════════
+# نظام الإعدادات والإحصائيات
+# ═══════════════════════════════════════════════════
+var settings: Dictionary = {"sound_enabled": true, "notifications_enabled": true, "auto_save_enabled": true}
+var total_scrap_earned: int = 0
+var total_fuel_earned: int = 0
+var total_intel_earned: int = 0
+var total_play_time: float = 0.0
+var total_xp_earned: int = 0
+
+func reset_game() -> void:
+        if FileAccess.file_exists(SAVE_PATH):
+                DirAccess.remove_absolute(SAVE_PATH)
+        scrap = 500
+        fuel = 300
+        intel = 100
+        player_level = 1
+        player_xp = 0
+        level_bonus_attack = 0.0
+        level_bonus_defense = 0.0
+        level_bonus_production = 0.0
+        level_skill_points = 0
+        player_morale = 70.0
+        total_battles_won = 0
+        total_battles_lost = 0
+        consecutive_wins = 0
+        total_scrap_earned = 0
+        total_fuel_earned = 0
+        total_intel_earned = 0
+        total_play_time = 0.0
+        total_xp_earned = 0
+        current_campaign_stage = 0
+        battle_is_campaign = false
+        battle_campaign_stage_id = -1
+        completed_convoys_count = 0
+        completed_techs = []
+        research_in_progress = ""
+        research_progress = 0.0
+        tutorial_step = 0
+        tutorial_completed = false
+        show_tutorial = true
+        settings = {"sound_enabled": true, "notifications_enabled": true, "auto_save_enabled": true}
+        _init_buildings()
+        _init_companies()
+        _init_deployment()
+        _init_world_map()
+        _init_tech_tree()
+        _init_campaigns()
+        _init_officers()
+        _init_fortifications()
+        _init_missions()
+        _init_events()
+        _init_convoys()
+        _init_troop_upgrades()
+        _init_achievements()
+        recalculate_tech_bonuses()
+        settings_changed.emit()
+
+# ═══════════════════════════════════════════════════
+# نظام التعليمات
+# ═══════════════════════════════════════════════════
+var tutorial_step: int = 0
+var tutorial_completed: bool = false
+var show_tutorial: bool = true
+
+var tutorial_texts: Array[String] = [
+        "",
+        "مرحباً يا جنرال! أنت قائد القوات المسلحة. هدفك تحرير المناطق من سيطرة العدو.",
+        "⚙️ الخردة و ⛽ الوقود و 📋 المعلومات — هذه مواردك الأساسية. المنشآت تنتجها تلقائياً.",
+        "اختار القوات وانشرها في الموجات. المشاة رخيصة، المدرعات متوازنة، والطيران قوي لكن مكلف.",
+        "⚡ اضغط 'هجوم' لبدء المعركة. استخدم التكتيكات: دخان لتقليل ضرر العدو، دعم جوي لزيادة ضررك.",
+        "🗺️ استكشف الخريطة لتحرير القطاعات. كل قطاع يمنحك موارد وXP.",
+        "📖 الحملات تقدمك في القصة مع مراحل صعبة وBosses.",
+        "🎖️ عيّن ضباطاً في الثكنات لتحسين قدرات قواتك.",
+        "أنت جاهز! ابدأ بتحرير أول قطاع من الخريطة. حظاً موفقاً يا جنرال!",
+]
+
+func advance_tutorial() -> void:
+        tutorial_step += 1
+        if tutorial_step >= tutorial_texts.size():
+                tutorial_completed = true
+                tutorial_step = 0
+                show_tutorial = false
+        tutorial_step_changed.emit(tutorial_step)
+
+func is_tutorial_done() -> bool:
+        return tutorial_completed or tutorial_step == 0
+
 # ─── الحفظ والتحميل ───
 const SAVE_PATH := "user://generals_fist_save.json"
 
@@ -1511,6 +1786,19 @@ func save_game() -> void:
                 # أنظمة L3
                 "troop_upgrades": troop_upgrades, "active_convoys": active_convoys,
                 "completed_convoys_count": completed_convoys_count,
+                # أنظمة L4
+                "achievements": achievements, "settings": settings,
+                "total_battles_won": total_battles_won,
+                "total_battles_lost": total_battles_lost,
+                "consecutive_wins": consecutive_wins,
+                "total_scrap_earned": total_scrap_earned,
+                "total_fuel_earned": total_fuel_earned,
+                "total_intel_earned": total_intel_earned,
+                "total_play_time": total_play_time,
+                "total_xp_earned": total_xp_earned,
+                "tutorial_step": tutorial_step,
+                "tutorial_completed": tutorial_completed,
+                "show_tutorial": show_tutorial,
         }
         var file := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
         if file:
@@ -1570,6 +1858,20 @@ func load_game() -> bool:
         troop_upgrades = data.get("troop_upgrades", troop_upgrades)
         active_convoys = data.get("active_convoys", active_convoys)
         completed_convoys_count = data.get("completed_convoys_count", 0)
+        # استعادة أنظمة L4
+        achievements = data.get("achievements", achievements)
+        settings = data.get("settings", settings)
+        total_battles_won = data.get("total_battles_won", 0)
+        total_battles_lost = data.get("total_battles_lost", 0)
+        consecutive_wins = data.get("consecutive_wins", 0)
+        total_scrap_earned = data.get("total_scrap_earned", 0)
+        total_fuel_earned = data.get("total_fuel_earned", 0)
+        total_intel_earned = data.get("total_intel_earned", 0)
+        total_play_time = data.get("total_play_time", 0.0)
+        total_xp_earned = data.get("total_xp_earned", 0)
+        tutorial_step = data.get("tutorial_step", 0)
+        tutorial_completed = data.get("tutorial_completed", false)
+        show_tutorial = data.get("show_tutorial", true)
         _process_idle_offline()
         return true
 
@@ -1603,6 +1905,7 @@ func _ready() -> void:
         _init_events()
         _init_convoys()
         _init_troop_upgrades()
+        _init_achievements()
         if not load_game():
                 print("[GameManager] بداية لعبة جديدة")
         check_mission_refresh()
@@ -1612,7 +1915,10 @@ func _notification(what: int) -> void:
         if what == NOTIFICATION_WM_GO_BACK_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED:
                 save_game()
 
+var _achievement_check_timer: float = 0.0
+
 func _process(delta: float) -> void:
+        total_play_time += delta
         _idle_tick(delta)
         update_events(delta)
         update_research(delta)
@@ -1624,3 +1930,8 @@ func _process(delta: float) -> void:
         if _auto_save_timer >= AUTO_SAVE_INTERVAL:
                 _auto_save_timer = 0.0
                 save_game()
+        # فحص الإنجازات المبنية على الموارد كل 5 ثواني
+        _achievement_check_timer += delta
+        if _achievement_check_timer >= 5.0:
+                _achievement_check_timer = 0.0
+                check_achievements()
